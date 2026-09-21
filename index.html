@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Flight Simulator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <div id="app">
+      <div id="vignette"></div>
+
+      <div id="hud">
+        <div id="objective"></div>
+        <div id="warnings"></div>
+        <div id="toast"></div>
+
+        <button id="controls-toggle" type="button">CONTROLS</button>
+        <aside id="help">
+          <header>
+            <span>CONTROLS</span>
+            <button id="help-hide" type="button">Hide</button>
+          </header>
+          <ul>
+            <li><kbd>W</kbd><span>Pitch up</span></li>
+            <li><kbd>S</kbd><span>Pitch down</span></li>
+            <li><kbd>A</kbd><span>Roll left</span></li>
+            <li><kbd>D</kbd><span>Roll right</span></li>
+            <li><kbd>Q</kbd><span>Yaw left</span></li>
+            <li><kbd>E</kbd><span>Yaw right</span></li>
+            <li><kbd>Shift</kbd><span>Throttle up</span></li>
+            <li><kbd>Ctrl</kbd><span>Throttle down</span></li>
+            <li><kbd>Space</kbd><span>Brake / speedbrake</span></li>
+            <li><kbd>H</kbd><span>Toggle this panel</span></li>
+            <li><kbd>M</kbd><span>Mute engine</span></li>
+          </ul>
+          <p>On the ground, A and D also steer. Hold W to rotate near 120 kt. In the air, Space adds drag.</p>
+          <button id="restart-flight" type="button">Restart flight</button>
+        </aside>
+
+        <div id="minimap-wrap">
+          <canvas id="minimap" width="180" height="180"></canvas>
+          <div id="minimap-label">HORIZON FIELD</div>
+        </div>
+
+        <div id="cluster">
+          <div id="ai" aria-hidden="true">
+            <div id="ai-rot">
+              <div id="ai-shift">
+                <div class="ai-sky"></div>
+                <div class="ai-ground"></div>
+                <div id="ai-ladder"></div>
+              </div>
+            </div>
+            <div id="ai-fixed">
+              <div class="wing-ref left"></div>
+              <div class="wing-ref right"></div>
+              <div class="nose-ref"></div>
+              <div id="fd-pitch"></div>
+              <div id="fd-bank"></div>
+            </div>
+            <div class="ai-pointer"></div>
+          </div>
+
+          <div class="tape" id="hdg-tape">
+            <div id="hdg-bug"></div>
+            <div id="hdg-marks"></div>
+            <div class="tape-caret"></div>
+            <div id="hdg-readout">360</div>
+          </div>
+
+          <div class="readouts">
+            <div class="read">
+              <span class="k">IAS</span>
+              <span class="v" id="ias">0</span>
+              <span class="u">KT</span>
+            </div>
+            <div class="read center-read">
+              <span class="k">STATUS</span>
+              <span class="status" id="status">ON GROUND</span>
+              <div id="throttle">
+                <div id="throttle-fill"></div>
+              </div>
+              <span class="engine" id="engine">IDLE</span>
+            </div>
+            <div class="read">
+              <span class="k">ALT</span>
+              <span class="v" id="alt">0</span>
+              <span class="u">FT</span>
+              <span class="vs" id="vs">0 FPM</span>
+            </div>
+          </div>
+
+          <div id="ils">
+            <div class="ils-label">LOC</div>
+            <div class="ils-box" id="loc-box"><div id="loc-needle"></div></div>
+            <div class="ils-label">GS</div>
+            <div class="ils-box tall" id="gs-box"><div id="gs-needle"></div></div>
+            <div id="papi-dots" title="PAPI"></div>
+          </div>
+
+          <div id="config">
+            <span id="gear-ind">GEAR DN</span>
+            <span id="flap-ind">FLAPS TO</span>
+            <span id="time-ind">0:00</span>
+          </div>
+        </div>
+      </div>
+
+      <section id="menu">
+        <div class="menu-copy">
+          <p class="eyebrow">HORIZON FIELD · RWY 36 · WIND CALM</p>
+          <h1>FLIGHT SIMULATOR</h1>
+          <p class="lede">Take off, fly a left circuit around the airport, and land safely on runway 36.</p>
+          <button id="start-flight" type="button">START FLIGHT</button>
+          <dl class="brief">
+            <div><dt>W / S</dt><dd>Pitch up / down</dd></div>
+            <div><dt>A / D</dt><dd>Roll</dd></div>
+            <div><dt>Q / E</dt><dd>Yaw</dd></div>
+            <div><dt>Shift / Ctrl</dt><dd>Throttle</dd></div>
+            <div><dt>Space</dt><dd>Brake</dd></div>
+          </dl>
+        </div>
+      </section>
+
+      <section id="end" hidden>
+        <div class="report">
+          <p class="eyebrow" id="end-kicker">FLIGHT REPORT</p>
+          <h2 id="end-title">Flight completed</h2>
+          <p class="reason" id="end-reason"></p>
+          <p class="quality" id="end-quality"></p>
+          <p class="quality-label" id="end-quality-label">Landing quality</p>
+          <div class="stats">
+            <div>
+              <span id="end-time">0:00</span>
+              <small>Flight time</small>
+            </div>
+            <div>
+              <span id="end-score">0</span>
+              <small>Final score</small>
+            </div>
+          </div>
+          <ul id="end-breakdown"></ul>
+          <button id="play-again" type="button">PLAY AGAIN</button>
+        </div>
+      </section>
+
+      <div id="paused" hidden>PAUSED — click to resume</div>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
