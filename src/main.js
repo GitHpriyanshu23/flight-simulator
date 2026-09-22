@@ -7,6 +7,10 @@ import { clearKeys, onHelpToggle, onMuteToggle, readInput, setInputOverride } fr
 import { createAudio } from './audio.js';
 import { createHud } from './hud.js';
 import { createAutopilot } from './autopilot.js';
+import { inject } from '@vercel/analytics';
+
+// Initialize Vercel Analytics
+inject();
 
 const AUTOTEST = new URLSearchParams(location.search).has('autotest');
 const UP = new THREE.Vector3(0, 1, 0);
